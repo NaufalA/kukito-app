@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+/* Custom scrollbars for clean mobile feel */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Safe area insets for notched mobile devices */
+.safe-pb {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+.safe-pt {
+  padding-top: env(safe-area-inset-top, 0.5rem);
+}
