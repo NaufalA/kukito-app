@@ -10,6 +10,7 @@ interface ChatInterfaceProps {
   ingredients: Ingredient[];
   equipment: Equipment[];
   apiKey: string;
+  model: string;
   savedRecipes: Recipe[];
   onSendMessage: (msg: ChatMessage) => void;
   onSaveRecipe: (recipe: Recipe) => void;
@@ -23,6 +24,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   ingredients,
   equipment,
   apiKey,
+  model,
   savedRecipes,
   onSendMessage,
   onSaveRecipe,
@@ -56,7 +58,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         userPrompt,
         ingredients,
         equipment,
-        apiKey
+        apiKey,
+        model,
       );
 
       const botMessage: ChatMessage = {
@@ -118,11 +121,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
             >
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
-                  isUser
+                className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${isUser
                     ? 'bg-orange-600 text-white rounded-br-sm'
                     : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-sm shadow-sm'
-                }`}
+                  }`}
               >
                 {!isUser && (
                   <div className="flex items-center gap-1 text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-1">

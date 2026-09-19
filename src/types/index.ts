@@ -93,3 +93,6 @@ export interface UserSettings {
   hasCompletedOnboarding: boolean;
   theme: 'dark' | 'light';
 }
+
+
+export * from './gemini';

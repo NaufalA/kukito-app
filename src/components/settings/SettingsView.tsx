@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Key, RotateCcw, ExternalLink, Sparkles, Check, Trash2 } from 'lucide-react';
-import { UserSettings } from '../../types';
+import { GeminiModel, UserSettings } from '../../types';
+import { listGeminiModels } from '../../services/gemini';
 
 interface SettingsViewProps {
   settings: UserSettings;
@@ -16,8 +17,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onResetAllData,
 }) => {
   const [apiKey, setApiKey] = useState(settings.geminiApiKey || '');
-  const [model, setModel] = useState(settings.geminiModel || 'gemini-2.5-flash');
+  const [model, setModel] = useState(settings.geminiModel || '');
   const [isSaved, setIsSaved] = useState(false);
+
+  const [models, setModels] = useState<GeminiModel[]>([]);
+
+  useEffect(() => {
+    try {
+      listGeminiModels(apiKey).then((data) => {
+        setModels(data);
+      });
+    } catch (error) {
+    }
+  }, [apiKey]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,9 +88,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             onChange={(e) => setModel(e.target.value)}
             className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500"
           >
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fastest, Recommended)</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep reasoning)</option>
+            {models.map((model) => (
+              <option value={model.name}>{model.displayName}</option>
+            ))}
           </select>
         </div>
 

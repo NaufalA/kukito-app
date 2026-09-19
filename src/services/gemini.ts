@@ -1,11 +1,35 @@
-import { Ingredient, Equipment, Recipe } from '../types';
+import { Ingredient, Equipment, Recipe, GeminiModel } from '../types';
+import { ListGeminiModelsResponse } from '../types/dtos';
+
+export async function listGeminiModels(apiKey: string): Promise<GeminiModel[]> {
+  const pageSize = 100;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=${pageSize}`
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.error?.message || `Gemini API returned ${response.status}`);
+  }
+
+  const data: ListGeminiModelsResponse = await response.json();
+
+  return data.models.filter((model) => (
+    model.name.includes('gemini-3.')
+    && !model.name.includes('image')
+    && !model.name.includes('preview')
+    && model.supportedGenerationMethods.includes('generateContent')
+  ));
+}
 
 export async function generateRecipeWithGemini(
   prompt: string,
   ingredients: Ingredient[],
   equipment: Equipment[],
   apiKey: string,
-  modelName: string = 'gemini-2.5-flash'
+  modelName: string = 'gemini-3.5-flash'
 ): Promise<{ text: string; recipe?: Recipe }> {
   // If user provided a live API key, call the official Google Gemini API
   if (apiKey && apiKey.trim().length > 10) {
@@ -20,7 +44,7 @@ export async function generateRecipeWithGemini(
         .map((e) => e.name)
         .join(', ');
 
-      const systemInstruction = 
+      const systemInstruction =
         "You are Kukito! 🤌, an expert, encouraging home chef and kitchen companion.\n" +
         "User's Current In-Stock Ingredients: " + (activeIngredients || 'None listed') + "\n" +
         "User's Available Kitchen Equipment: " + (availableEquipment || 'Basic stove and cookware') + "\n\n" +
@@ -44,7 +68,7 @@ export async function generateRecipeWithGemini(
         "}\n" +
         "Make sure ingredient names match the user's inventory names wherever possible so our app can automatically deduct them!";
 
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey.trim()}`;
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/${modelName}:generateContent?key=${apiKey.trim()}`;
 
       const response = await fetch(endpoint, {
         method: 'POST',

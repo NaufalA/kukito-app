@@ -312,6 +312,7 @@ export function App() {
             ingredients={ingredients}
             equipment={equipment}
             apiKey={settings.geminiApiKey}
+            model={settings.geminiModel}
             savedRecipes={recipes}
             onSendMessage={(msg) => updateChat([...chatMessages, msg])}
             onSaveRecipe={(recipe) => {
