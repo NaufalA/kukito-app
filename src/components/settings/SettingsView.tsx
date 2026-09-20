@@ -89,7 +89,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500"
           >
             {models.map((model) => (
-              <option value={model.name}>{model.displayName}</option>
+              <option key={model.name} value={model.name}>
+                {model.displayName}
+              </option>
             ))}
           </select>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Sparkles, BookOpen, Refrigerator, Wrench } from 'lucide-react';
 import { Ingredient, Equipment, Recipe, DeductionItem, ChatMessage, UserSettings } from './types';
-import { storageService, STARTER_RECIPES } from './services/storage';
+import { storageService } from './services/storage';
 import { Header } from './components/common/Header';
 import { BottomNav, TabType } from './components/common/BottomNav';
 import { Toast } from './components/common/Toast';
@@ -17,6 +17,7 @@ import { CookingGuideModal } from './components/recipes/CookingGuideModal';
 import { DeductionModal } from './components/recipes/DeductionModal';
 import { ChatInterface } from './components/ai/ChatInterface';
 import { SettingsView } from './components/settings/SettingsView';
+import { initiateGemini } from './services/gemini';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<TabType>('pantry');
@@ -59,6 +60,8 @@ export function App() {
 
     if (!currentSettings.hasCompletedOnboarding && savedIngs.length === 0) {
       setIsOnboardingOpen(true);
+    } else if (currentSettings.geminiApiKey) {
+      initiateGemini(currentSettings.geminiApiKey);
     }
   }, []);
 
@@ -359,9 +362,9 @@ export function App() {
             </div>
 
             <div className="space-y-2.5">
-              {recipes.map((recipe) => (
+              {recipes.map((recipe, index) => (
                 <RecipeCard
-                  key={recipe.id}
+                  key={`${recipe.id}-${index}`}
                   recipe={recipe}
                   inventory={ingredients}
                   onOpen={(rec) => setSelectedRecipeDetail(rec)}
@@ -384,7 +387,7 @@ export function App() {
               localStorage.clear();
               setIngredients([]);
               setEquipment([]);
-              setRecipes(STARTER_RECIPES);
+              setRecipes([]);
               setChatMessages([]);
               setSettings(storageService.getSettings());
               setIsOnboardingOpen(true);
@@ -415,6 +418,7 @@ export function App() {
           setSettings(updatedSettings);
           storageService.setSettings(updatedSettings);
           setIsOnboardingOpen(false);
+          initiateGemini(newApiKey);
           setToastMessage('Kitchen setup complete! Welcome to Kukito! 🤌');
           setTimeout(() => setToastMessage(null), 3500);
         }}
@@ -468,6 +472,7 @@ export function App() {
           isOpen={true}
           recipe={activeDeductionRecipe}
           inventory={ingredients}
+          equipment={equipment}
           onClose={() => setActiveDeductionRecipe(null)}
           onConfirmDeduction={handleConfirmDeduction}
         />

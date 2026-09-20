@@ -29,70 +29,13 @@ export const ONBOARDING_EQUIPMENT: Omit<Equipment, 'id'>[] = [
   { name: 'Saucepan / Pot', category: 'cookware', isAvailable: true },
   { name: "Chef's Knife", category: 'prep', isAvailable: true },
   { name: 'Cutting Board', category: 'prep', isAvailable: true },
+  { name: 'Tablespoon', category: 'measuring', measurement: [{ amount: 1, unit: 'tablespoon' }, { amount: 1, unit: 'tbsp' }, { amount: 15, unit: 'ml' }], isAvailable: true },
+  { name: 'Teaspoon', category: 'measuring', measurement: [{ amount: 1, unit: 'teaspoon' }, { amount: 1, unit: 'tsp' }, { amount: 5, unit: 'ml' }], isAvailable: true },
   { name: 'Air Fryer', category: 'appliances', isAvailable: true },
   { name: 'Rice Cooker', category: 'appliances', isAvailable: true },
   { name: 'Oven', category: 'baking', isAvailable: true },
   { name: 'Blender', category: 'appliances', isAvailable: false },
   { name: 'Microwave', category: 'appliances', isAvailable: true },
-];
-
-export const STARTER_RECIPES: Recipe[] = [
-  {
-    id: 'starter-1',
-    title: 'Garlic Butter Spaghetti',
-    description: 'A lightning-fast, ultra-flavorful Italian classic ready in under 15 minutes.',
-    cuisine: 'Italian',
-    prepTimeMinutes: 5,
-    cookTimeMinutes: 10,
-    servings: 2,
-    difficulty: 'Easy',
-    ingredients: [
-      { name: 'Pasta', amount: 200, unit: 'g' },
-      { name: 'Garlic', amount: 3, unit: 'cloves' },
-      { name: 'Butter', amount: 30, unit: 'g' },
-      { name: 'Olive Oil', amount: 15, unit: 'ml' },
-      { name: 'Black Pepper', amount: 2, unit: 'g' },
-      { name: 'Salt', amount: 5, unit: 'g' },
-    ],
-    equipment: ['Saucepan / Pot', 'Non-stick Frying Pan', "Chef's Knife", 'Cutting Board'],
-    steps: [
-      'Bring a pot of salted water to a rolling boil and cook spaghetti until al dente (approx 8-9 mins).',
-      'Thinly slice the garlic cloves.',
-      'In a frying pan over medium-low heat, heat olive oil and melt the butter. Gently sauté garlic until golden and fragrant (do not burn).',
-      'Transfer cooked pasta directly into the garlic butter pan, adding 2 tablespoons of starchy pasta water.',
-      'Toss vigorously for 1 minute until a glossy emulsified sauce coats the pasta. Season with freshly ground black pepper and serve hot!',
-    ],
-    tips: ['Reserving starchy pasta water is the secret to getting a restaurant-glossy sauce.'],
-    isFavorite: true,
-  },
-  {
-    id: 'starter-2',
-    title: 'Crispy Garlic Soy Chicken',
-    description: 'Juicy chicken bites with a savory garlic-soy glaze made easily in a pan or air fryer.',
-    cuisine: 'Asian Fusion',
-    prepTimeMinutes: 10,
-    cookTimeMinutes: 15,
-    servings: 2,
-    difficulty: 'Easy',
-    ingredients: [
-      { name: 'Chicken Breast', amount: 350, unit: 'g' },
-      { name: 'Garlic', amount: 2, unit: 'cloves' },
-      { name: 'Soy Sauce', amount: 30, unit: 'ml' },
-      { name: 'Olive Oil', amount: 10, unit: 'ml' },
-      { name: 'Black Pepper', amount: 2, unit: 'g' },
-    ],
-    equipment: ['Non-stick Frying Pan', "Chef's Knife", 'Cutting Board'],
-    steps: [
-      'Dice the chicken breast into bite-sized 2cm cubes.',
-      'Mince the garlic and mix with soy sauce and black pepper in a small bowl.',
-      'Heat olive oil in the non-stick pan over medium-high heat.',
-      'Sear chicken cubes for 5-6 minutes until golden brown on all sides.',
-      'Pour the garlic-soy mixture into the hot pan. Sizzle and stir for 2 minutes until the sauce reduces into a savory sticky glaze coating the chicken.',
-      'Serve over steamed white rice!',
-    ],
-    tips: ['If using an Air Fryer, roast chicken at 190°C (375°F) for 12 mins, tossing halfway.'],
-    isFavorite: false,
-  },
 ];
 
 export const storageService = {
@@ -116,7 +59,7 @@ export const storageService = {
 
   getRecipes(): Recipe[] {
     const raw = localStorage.getItem(STORAGE_KEYS.RECIPES);
-    return raw ? JSON.parse(raw) : STARTER_RECIPES;
+    return raw ? JSON.parse(raw) : [];
   },
 
   setRecipes(recipes: Recipe[]): void {

@@ -58,7 +58,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         userPrompt,
         ingredients,
         equipment,
-        apiKey,
         model,
       );
 
@@ -122,8 +121,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             >
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${isUser
-                    ? 'bg-orange-600 text-white rounded-br-sm'
-                    : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-sm shadow-sm'
+                  ? 'bg-orange-600 text-white rounded-br-sm'
+                  : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-sm shadow-sm'
                   }`}
               >
                 {!isUser && (

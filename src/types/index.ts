@@ -1,3 +1,9 @@
+import { Recipe } from './recipe';
+
+export * from './recipe';
+export * from './equipment';
+export * from './gemini';
+
 export type IngredientCategory =
   | 'produce'
   | 'dairy'
@@ -22,45 +28,13 @@ export interface Ingredient {
   notes?: string;
 }
 
-export type EquipmentCategory = 'cookware' | 'appliances' | 'prep' | 'baking' | 'other';
-
-export interface Equipment {
-  id: string;
-  name: string;
-  category: EquipmentCategory;
-  isAvailable: boolean;
-  notes?: string;
-}
-
-export interface RecipeIngredient {
-  name: string;
-  amount: number;
-  unit: string;
-  matchedIngredientId?: string;
-}
-
-export interface Recipe {
-  id: string;
-  title: string;
-  description: string;
-  cuisine?: string;
-  prepTimeMinutes: number;
-  cookTimeMinutes: number;
-  servings: number;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  ingredients: RecipeIngredient[];
-  equipment: string[];
-  steps: string[];
-  tips?: string[];
-  isAiGenerated?: boolean;
-  isFavorite?: boolean;
-}
-
 export interface DeductionItem {
   ingredientId: string;
   ingredientName: string;
   currentStock: number;
   recipeAmount: number;
+  recipeUnit: string;
+  unitDifferent: boolean;
   deductAmount: number; // Editable by user
   unit: string;
   isExcluded: boolean; // User toggle to skip
@@ -93,6 +67,3 @@ export interface UserSettings {
   hasCompletedOnboarding: boolean;
   theme: 'dark' | 'light';
 }
-
-
-export * from './gemini';

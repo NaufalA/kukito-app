@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { X, Minus, Plus, AlertCircle, Sparkles, Check, RotateCcw } from 'lucide-react';
-import { Recipe, Ingredient, DeductionItem } from '../../types';
+import { X, Minus, Plus, AlertCircle, Sparkles, Check, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Recipe, Ingredient, DeductionItem, Equipment } from '../../types';
 
 interface DeductionModalProps {
   isOpen: boolean;
   recipe: Recipe;
   inventory: Ingredient[];
+  equipment: Equipment[];
   onClose: () => void;
   onConfirmDeduction: (items: DeductionItem[]) => void;
 }
@@ -14,6 +15,7 @@ export const DeductionModal: React.FC<DeductionModalProps> = ({
   isOpen,
   recipe,
   inventory,
+  equipment,
   onClose,
   onConfirmDeduction,
 }) => {
@@ -21,18 +23,45 @@ export const DeductionModal: React.FC<DeductionModalProps> = ({
 
   // Build deduction items list matched against inventory
   const [deductionItems, setDeductionItems] = useState<DeductionItem[]>(() => {
+    const equipmentWithMeasurement = equipment.filter((eq) => eq.measurement)
+
     return recipe.ingredients.map((recIng) => {
       const matched = inventory.find((inv) =>
         inv.name.toLowerCase().includes(recIng.name.toLowerCase()) ||
         recIng.name.toLowerCase().includes(inv.name.toLowerCase())
       );
 
+      let deductAmount = recIng.amount;
+      let unitDifferent = false;
+      // convert deduction amount if units is different
+      if (matched && matched.unit !== recIng.unit) {
+        unitDifferent = true;
+        // find equipment that have recipe unit measurement
+        let measuringEq = equipmentWithMeasurement.find(
+          (eq) => eq.measurement?.find((m) => m.unit === recIng.unit)
+        )
+
+        if (measuringEq) {
+          // find measurement for stock unit
+          const matchedMeasurement = measuringEq.measurement?.find(
+            (m) => m.unit === matched.unit
+          )
+          console.log(recIng.amount, matchedMeasurement?.amount, matchedMeasurement?.unit);
+
+          if (matchedMeasurement) {
+            deductAmount = recIng.amount * matchedMeasurement?.amount
+          }
+        }
+      }
+
       return {
         ingredientId: matched?.id || 'unmatched-' + recIng.name,
         ingredientName: matched ? matched.name : recIng.name,
         currentStock: matched ? matched.quantity : 0,
         recipeAmount: recIng.amount,
-        deductAmount: recIng.amount, // Initialized to recipe amount, editable by user!
+        recipeUnit: recIng.unit,
+        unitDifferent,
+        deductAmount, // Initialized to recipe amount, editable by user!
         unit: matched ? matched.unit : recIng.unit,
         isExcluded: !matched, // Exclude by default if not in stock
       };
@@ -99,11 +128,10 @@ export const DeductionModal: React.FC<DeductionModalProps> = ({
             return (
               <div
                 key={item.ingredientName + idx}
-                className={`p-3 rounded-xl border transition-all ${
-                  item.isExcluded
-                    ? 'bg-slate-900/50 border-slate-800/60 opacity-50'
-                    : 'bg-slate-950 border-slate-800'
-                }`}
+                className={`p-3 rounded-xl border transition-all ${item.isExcluded
+                  ? 'bg-slate-900/50 border-slate-800/60 opacity-50'
+                  : 'bg-slate-950 border-slate-800'
+                  }`}
               >
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -114,7 +142,16 @@ export const DeductionModal: React.FC<DeductionModalProps> = ({
                       disabled={isUnmatched}
                       className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-orange-600 focus:ring-0 cursor-pointer"
                     />
-                    <span className="text-xs font-semibold text-white truncate">{item.ingredientName}</span>
+                    <span className="text-xs font-semibold text-white truncate">
+                      {`${item.ingredientName} (recipe: ${item.recipeAmount} ${item.recipeUnit})`}
+                    </span>
+                    {item.unitDifferent && (
+                      <span
+                        title="Recipe and stock units are different please review the deduction amount"
+                      >
+                        <AlertTriangle className="w-2.5 h-2.5 text-amber-500" />
+                      </span>
+                    )}
                   </label>
 
                   {isUnmatched ? (

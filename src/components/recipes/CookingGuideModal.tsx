@@ -129,30 +129,53 @@ export const CookingGuideModal: React.FC<CookingGuideModalProps> = ({
           Steps ({completedSteps.length}/{recipe.steps.length} done)
         </h3>
 
-        {recipe.steps.map((stepText, idx) => {
+        {recipe.steps.map((step, idx) => {
           const isDone = completedSteps.includes(idx);
           return (
             <div
               key={idx}
               onClick={() => toggleStep(idx)}
-              className={`p-3.5 rounded-xl border transition-all cursor-pointer flex gap-3 ${
-                isDone
-                  ? 'bg-emerald-950/20 border-emerald-500/40 text-slate-400'
-                  : 'bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-200'
-              }`}
+              className={`p-3.5 rounded-xl border transition-all cursor-pointer flex gap-3 ${isDone
+                ? 'bg-emerald-950/20 border-emerald-500/40 text-slate-400'
+                : 'bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-200'
+                }`}
             >
               <div
-                className={`w-6 h-6 rounded-lg shrink-0 flex items-center justify-center font-bold text-xs ${
-                  isDone
-                    ? 'bg-emerald-500 text-slate-950'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'
-                }`}
+                className={`w-6 h-6 rounded-lg shrink-0 flex items-center justify-center font-bold text-xs ${isDone
+                  ? 'bg-emerald-500 text-slate-950'
+                  : 'bg-slate-800 text-slate-400 border border-slate-700'
+                  }`}
               >
                 {isDone ? <Check className="w-3.5 h-3.5" /> : idx + 1}
               </div>
-              <p className={`text-xs leading-relaxed ${isDone ? 'line-through opacity-70' : ''}`}>
-                {stepText}
-              </p>
+              <div className="flex flex-col gap-1">
+                <p className={`text-xs leading-relaxed ${isDone ? 'line-through opacity-70' : ''}`}>
+                  {step.headline}
+                </p>
+                <p className={`text-xs leading-relaxed ${isDone ? 'line-through opacity-70' : ''}`}>
+                  {step.description}
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {step.ingredientNames?.map((ingredient, index) => {
+                    const ingredientSplit = ingredient.split('|')
+                    if (ingredientSplit.length > 1) {
+                      const ingredientName = ingredientSplit[0].trim();
+                      const ingredientAmountAndUnit = ingredientSplit[1].trim();
+                      return (
+                        <span key={index} className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${isDone ? 'bg-slate-800 text-slate-400 border-slate-700/60' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'} flex items-center gap-1`}>
+                          {ingredientName} {ingredientAmountAndUnit}
+                        </span>
+                      )
+                    }
+                    const ingredientDetail = recipe.ingredients.find((item) => item.name === ingredient);
+                    return ingredientDetail ? (
+                      <span key={index} className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${isDone ? 'bg-slate-800 text-slate-400 border-slate-700/60' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'} flex items-center gap-1`}>
+                        {ingredientDetail.name} {ingredientDetail.amount} {ingredientDetail.unit}
+                      </span>
+                    ) : ''
+                  })}
+                </div>
+              </div>
             </div>
           );
         })}
