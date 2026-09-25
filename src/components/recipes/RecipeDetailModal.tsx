@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Clock, Users, Flame, Utensils, CheckCircle2, AlertCircle, Play } from 'lucide-react';
+import { X, Clock, Users, Flame, Utensils, CheckCircle2, AlertCircle, Play, Trash2, Edit3 } from 'lucide-react';
 import { Recipe, Ingredient, Equipment } from '../../types';
 
 interface RecipeDetailModalProps {
@@ -10,6 +10,9 @@ interface RecipeDetailModalProps {
   onClose: () => void;
   onStartCooking: (recipe: Recipe) => void;
   onDirectCookDeduct: (recipe: Recipe) => void;
+  onDelete: (recipeId: string) => void;
+  onEdit: (recipe: Recipe) => void;
+  hideActions?: boolean;
 }
 
 export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
@@ -20,6 +23,9 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   onClose,
   onStartCooking,
   onDirectCookDeduct,
+  onDelete,
+  onEdit,
+  hideActions = false,
 }) => {
   if (!isOpen || !recipe) return null;
 
@@ -31,9 +37,21 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
           <span className="text-[10px] font-bold uppercase tracking-wider text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
             {recipe.cuisine || 'Home Cooking'}
           </span>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-white">
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex gap-1">
+            {!hideActions && (
+              <>
+                <button onClick={() => onEdit(recipe)} className="p-1 text-slate-400 hover:text-blue-400 transition-colors" title="Edit">
+                  <Edit3 className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => onDelete(recipe.id)} className="p-1 text-slate-400 hover:text-red-400 transition-colors" title="Delete">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
+            <button onClick={onClose} className="p-1 text-slate-400 hover:text-white">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto pr-1 space-y-4">

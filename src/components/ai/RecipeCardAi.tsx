@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bookmark, Sparkles, Clock, Flame, Check } from 'lucide-react';
+import { Bookmark, Sparkles, Clock, Check } from 'lucide-react';
 import { Recipe } from '../../types';
 
 interface RecipeCardAiProps {

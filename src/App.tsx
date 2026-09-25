@@ -15,6 +15,7 @@ import { RecipeCard } from './components/recipes/RecipeCard';
 import { RecipeDetailModal } from './components/recipes/RecipeDetailModal';
 import { CookingGuideModal } from './components/recipes/CookingGuideModal';
 import { DeductionModal } from './components/recipes/DeductionModal';
+import { RecipeModal } from './components/recipes/RecipeModal';
 import { ChatInterface } from './components/ai/ChatInterface';
 import { SettingsView } from './components/settings/SettingsView';
 import { initiateGemini } from './services/gemini';
@@ -37,8 +38,11 @@ export function App() {
   const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(null);
   const [isEquipmentModalOpen, setIsEquipmentModalOpen] = useState(false);
   const [selectedRecipeDetail, setSelectedRecipeDetail] = useState<Recipe | null>(null);
+  const [recipeDetailHideActions, setRecipeDetailHideActions] = useState(false);
   const [activeCookingRecipe, setActiveCookingRecipe] = useState<Recipe | null>(null);
   const [activeDeductionRecipe, setActiveDeductionRecipe] = useState<Recipe | null>(null);
+  const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
+  const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
 
   // Toast
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -120,6 +124,44 @@ export function App() {
 
   const handleDeleteEquipment = (id: string) => {
     updateEquipment(equipment.filter((e) => e.id !== id));
+  };
+
+  // Recipe Handlers
+  const handleDeleteRecipe = (recipeId: string) => {
+    const recipe = recipes.find((r) => r.id === recipeId);
+    if (recipe && window.confirm(`Delete "${recipe.title}"?`)) {
+      updateRecipes(recipes.filter((r) => r.id !== recipeId));
+      setToastMessage(`"${recipe.title}" deleted from collection.`);
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+    setSelectedRecipeDetail(null);
+  };
+
+  const handleOpenRecipeCreate = () => {
+    setRecipeToEdit(null);
+    setIsRecipeModalOpen(true);
+  };
+
+  const handleOpenRecipeEdit = (recipe: Recipe) => {
+    setRecipeToEdit(recipe);
+    setIsRecipeModalOpen(true);
+  };
+
+  const handleSaveRecipe = (recipe: Recipe) => {
+    if (!recipes.some((r) => r.id === recipe.id)) {
+      updateRecipes([recipe, ...recipes]);
+      setToastMessage(`"${recipe.title}" added to collection! 🤌`);
+    } else {
+      updateRecipes(recipes.map((r) => (r.id === recipe.id ? recipe : r)));
+      setToastMessage(`"${recipe.title}" updated! 🤌`);
+    }
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleUpdateRecipe = (recipe: Recipe) => {
+    updateRecipes(recipes.map((r) => (r.id === recipe.id ? recipe : r)));
+    setToastMessage(`"${recipe.title}" updated! 🤌`);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   // Cooking & Deductions
@@ -326,7 +368,8 @@ export function App() {
               }
             }}
             onCookRecipe={(recipe) => {
-              setActiveDeductionRecipe(recipe);
+              setRecipeDetailHideActions(true);
+              setSelectedRecipeDetail(recipe);
             }}
             onOpenSettings={() => setActiveTab('settings')}
             onClearChat={() => {
@@ -353,12 +396,20 @@ export function App() {
                 </p>
               </div>
 
-              <button
-                onClick={() => setActiveTab('ai')}
-                className="flex items-center gap-1 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-orange-600/20 active:scale-95"
-              >
-                <Sparkles className="w-3.5 h-3.5" /> Ask AI Chef
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleOpenRecipeCreate}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-600/20 active:scale-95"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Create
+                </button>
+                <button
+                  onClick={() => setActiveTab('ai')}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-orange-600/20 active:scale-95"
+                >
+                  <Sparkles className="w-3.5 h-3.5" /> Ask AI Chef
+                </button>
+              </div>
             </div>
 
             <div className="space-y-2.5">
@@ -367,7 +418,9 @@ export function App() {
                   key={`${recipe.id}-${index}`}
                   recipe={recipe}
                   inventory={ingredients}
-                  onOpen={(rec) => setSelectedRecipeDetail(rec)}
+                  onOpen={(rec) => { setRecipeDetailHideActions(false); setSelectedRecipeDetail(rec); }}
+                  onDelete={handleDeleteRecipe}
+                  onEdit={handleOpenRecipeEdit}
                 />
               ))}
             </div>
@@ -452,6 +505,9 @@ export function App() {
           setSelectedRecipeDetail(null);
           setActiveDeductionRecipe(rec);
         }}
+        onDelete={handleDeleteRecipe}
+        onEdit={handleOpenRecipeEdit}
+        hideActions={recipeDetailHideActions}
       />
 
       {activeCookingRecipe && (
@@ -477,6 +533,19 @@ export function App() {
           onConfirmDeduction={handleConfirmDeduction}
         />
       )}
+
+      <RecipeModal
+        isOpen={isRecipeModalOpen}
+        recipeToEdit={recipeToEdit}
+        inventory={ingredients}
+        equipmentList={equipment}
+        onClose={() => {
+          setIsRecipeModalOpen(false);
+          setRecipeToEdit(null);
+        }}
+        onSave={handleSaveRecipe}
+        onUpdate={handleUpdateRecipe}
+      />
     </div>
   );
 }
