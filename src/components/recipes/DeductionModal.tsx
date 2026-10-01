@@ -27,8 +27,7 @@ export const DeductionModal: React.FC<DeductionModalProps> = ({
 
     return recipe.ingredients.map((recIng) => {
       const matched = inventory.find((inv) =>
-        inv.name.toLowerCase().includes(recIng.name.toLowerCase()) ||
-        recIng.name.toLowerCase().includes(inv.name.toLowerCase())
+        inv.name.toLowerCase() === recIng.name.toLowerCase()
       );
 
       let deductAmount = recIng.amount;
@@ -46,7 +45,6 @@ export const DeductionModal: React.FC<DeductionModalProps> = ({
           const matchedMeasurement = measuringEq.measurement?.find(
             (m) => m.unit === matched.unit
           )
-          console.log(recIng.amount, matchedMeasurement?.amount, matchedMeasurement?.unit);
 
           if (matchedMeasurement) {
             deductAmount = recIng.amount * matchedMeasurement?.amount

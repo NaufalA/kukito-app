@@ -16,8 +16,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, inventory, onOpe
     inventory.some(
       (inv) =>
         inv.quantity > 0 &&
-        (inv.name.toLowerCase().includes(recIng.name.toLowerCase()) ||
-          recIng.name.toLowerCase().includes(inv.name.toLowerCase()))
+        (inv.name.toLowerCase() === recIng.name.toLowerCase())
     )
   ).length;
 

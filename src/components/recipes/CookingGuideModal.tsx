@@ -44,6 +44,10 @@ export const CookingGuideModal: React.FC<CookingGuideModalProps> = ({
     setIsTimerRunning(true);
   };
 
+  const updateQuickTimer = (mins: number) => {
+    setTimerSeconds((curr) => curr + mins * 60);
+  };
+
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -79,16 +83,30 @@ export const CookingGuideModal: React.FC<CookingGuideModalProps> = ({
 
         <div className="flex items-center gap-2">
           {timerSeconds > 0 && (
+            <>
+            <button
+              onClick={() => updateQuickTimer(0.5)}
+              className="px-2.5 py-1 bg-slate-800 text-xs text-slate-300 rounded-lg hover:text-white"
+            >
+              +30s
+            </button>
             <button
               onClick={() => setIsTimerRunning(!isTimerRunning)}
               className="p-2 rounded-xl bg-orange-600 text-white font-bold active:scale-95"
             >
               {isTimerRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </button>
+            </>
           )}
 
           {timerSeconds === 0 ? (
             <div className="flex gap-1.5">
+              <button
+                onClick={() => startQuickTimer(1)}
+                className="px-2.5 py-1 bg-slate-800 text-xs text-slate-300 rounded-lg hover:text-white"
+              >
+                +1m
+              </button>
               <button
                 onClick={() => startQuickTimer(3)}
                 className="px-2.5 py-1 bg-slate-800 text-xs text-slate-300 rounded-lg hover:text-white"

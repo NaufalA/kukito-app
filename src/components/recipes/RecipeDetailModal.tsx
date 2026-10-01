@@ -86,8 +86,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
             <div className="space-y-1.5">
               {recipe.ingredients.map((ing, idx) => {
                 const matched = inventory.find((inv) =>
-                  inv.name.toLowerCase().includes(ing.name.toLowerCase()) ||
-                  ing.name.toLowerCase().includes(inv.name.toLowerCase())
+                  inv.name.toLowerCase() === ing.name.toLowerCase()
                 );
                 const hasEnough = matched && matched.quantity >= ing.amount;
 
@@ -135,11 +134,10 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                   return (
                     <span
                       key={idx}
-                      className={`text-[11px] font-medium px-2.5 py-1 rounded-lg border flex items-center gap-1.5 ${
-                        isReady
+                      className={`text-[11px] font-medium px-2.5 py-1 rounded-lg border flex items-center gap-1.5 ${isReady
                           ? 'bg-slate-800 text-slate-300 border-slate-700'
                           : 'bg-amber-950/20 text-amber-300 border-amber-800/40'
-                      }`}
+                        }`}
                     >
                       <Utensils className="w-3 h-3 text-slate-400" />
                       {tool}
