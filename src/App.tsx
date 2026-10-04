@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Sparkles, BookOpen, Refrigerator, Wrench } from 'lucide-react';
 import { Ingredient, Equipment, Recipe, DeductionItem, ChatMessage, UserSettings } from './types';
 import { storageService } from './services/storage';
+import { ImportedData } from './services/export';
 import { Header } from './components/common/Header';
 import { BottomNav, TabType } from './components/common/BottomNav';
 import { Toast } from './components/common/Toast';
@@ -161,6 +162,21 @@ export function App() {
   const handleUpdateRecipe = (recipe: Recipe) => {
     updateRecipes(recipes.map((r) => (r.id === recipe.id ? recipe : r)));
     setToastMessage(`"${recipe.title}" updated! 🤌`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Full data import (from Settings)
+  const handleImportData = (data: ImportedData) => {
+    storageService.setIngredients(data.ingredients);
+    storageService.setEquipment(data.equipment);
+    storageService.setRecipes(data.recipes);
+    storageService.setDeductionHistory(data.deductionHistory);
+    setIngredients(data.ingredients);
+    setEquipment(data.equipment);
+    setRecipes(data.recipes);
+    // Deduction history has no React state in App.tsx — it is read from
+    // storageService on demand (undo flow), so the storage write above is sufficient
+    setToastMessage('Data imported successfully! 🤌');
     setTimeout(() => setToastMessage(null), 3000);
   };
 
@@ -431,11 +447,18 @@ export function App() {
         {activeTab === 'settings' && (
           <SettingsView
             settings={settings}
+            exportCounts={{
+              ingredients: ingredients.length,
+              equipment: equipment.length,
+              recipes: recipes.length,
+              deductionHistory: storageService.getDeductionHistory().length,
+            }}
             onSaveSettings={(newSettings) => {
               setSettings(newSettings);
               storageService.setSettings(newSettings);
             }}
             onRunOnboarding={() => setIsOnboardingOpen(true)}
+            onImportData={handleImportData}
             onResetAllData={() => {
               localStorage.clear();
               setIngredients([]);

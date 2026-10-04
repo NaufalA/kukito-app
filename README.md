@@ -1,6 +1,6 @@
 # Kukito! 🤌 — Smart Kitchen & Recipe AI
 
-A mobile-first, offline-ready Progressive Web App (PWA) built with **React 19, TypeScript, Tailwind CSS v4, and Vite**. Kukito empowers home cooks to manage kitchen inventory, track equipment, chat with an integrated Google Gemini AI Chef to generate recipes tailored to what's in stock, and cook with an editable ingredient deduction and undo system.
+A mobile-first, offline-ready Progressive Web App (PWA) built with **React 19, TypeScript, Tailwind CSS v4, and Vite**. Kukito empowers home cooks to manage kitchen inventory, track equipment, chat with an integrated Google Gemini AI Chef to generate recipes tailored to what's in stock, cook with an editable ingredient deduction and undo system, and sync the whole kitchen between devices via JSON export/import.
 
 ---
 
@@ -20,7 +20,7 @@ A mobile-first, offline-ready Progressive Web App (PWA) built with **React 19, T
 ### 🤖 3. AI Chef Assistant (Google Gemini + Offline Fallback)
 - **Context Injection**: Automatically injects live in-stock ingredients and available gear into prompts.
 - **Dual Engine**:
-  - **Live Gemini API**: Connects to Google's `gemini-2.5-flash` or `gemini-1.5-flash` using your stored key.
+  - **Live Gemini API**: Authenticates with your stored key, fetches the available model list (filtered to the `gemini-3.*` family with `generateContent` support), and lets you pick the model in Settings.
   - **Smart Offline Engine**: Instantly generates delicious, valid recipes even without internet or an API key.
 - **Quick Prompts**: One-tap suggestions (*"What can I cook right now?"*, *"Quick 15-minute meal"*, *"Healthy high-protein dish"*).
 - **Interactive Recipe Cards**: Rendered inline in chat with **"Save Recipe"** and **"Cook & Deduct"** actions.
@@ -41,7 +41,13 @@ A mobile-first, offline-ready Progressive Web App (PWA) built with **React 19, T
 - **Live Stock Preview**: Real-time preview of remaining inventory before confirming.
 - **One-Click Undo**: Floating toast notification with an instant **Undo** button to roll back accidental deductions.
 
-### 📱 7. 100% Offline Progressive Web App (PWA)
+### 📤 7. Data Sync — Export & Import (PC ↔ Mobile)
+- **One-Click Export**: Download your kitchen — ingredients, equipment, recipes, and cooking history — as a single `kukito-export-YYYY-MM-DD.json` file from **Settings → Data Sync**.
+- **Safe Import**: A preview step shows the incoming record counts before you choose **Merge** (adds records by `id`, never overwrites existing data) or **Replace** (overwrites all four collections).
+- **Validated & Private**: Malformed files are rejected before anything is written; settings and your Gemini API key never leave the device.
+- The versioned file format and import rules are documented in [`docs/data-export-import.md`](docs/data-export-import.md).
+
+### 📱 8. 100% Offline Progressive Web App (PWA)
 - Full Web App Manifest and Workbox Service Worker caching.
 - Installable directly to the home screen on Android, iOS, and Desktop as a standalone app.
 
@@ -67,9 +73,11 @@ All libraries and assets used in Kukito! are 100% free and open-source for comme
 
 ```text
 kukito-app/
+├── AGENTS.md                    # Repository rules & AI agent workflow
 ├── docs/
-│   ├── implementation_plan.md   # Architectural specifications
-│   └── walkthrough.md           # Visual walkthrough & feature documentation
+│   ├── data-export-import.md    # Data export/import behavior & file format reference
+│   └── decisions/
+│       └── 0001-versioned-json-envelope.md  # ADR: versioned JSON export envelope
 ├── src/
 │   ├── components/
 │   │   ├── ai/                  # AI Chef chat interface & recipe cards
@@ -78,12 +86,15 @@ kukito-app/
 │   │   ├── onboarding/          # 3-step interactive setup wizard
 │   │   ├── pantry/              # Ingredient cards, modals, category filters
 │   │   ├── recipes/             # Recipe collection, detail, cooking guide, deduction
-│   │   └── settings/            # API key setup, reset wizard
+│   │   └── settings/            # API key & model setup, data sync, reset
 │   ├── services/
 │   │   ├── gemini.ts            # Google Gemini API client & offline generator
+│   │   ├── export.ts            # Export envelope, import validation, merge/replace
 │   │   └── storage.ts           # Typed localStorage persistence
 │   ├── types/
-│   │   └── index.ts             # TypeScript data models
+│   │   ├── index.ts             # Core data models (Ingredient, Equipment, DeductionRecord, …)
+│   │   ├── recipe.ts / equipment.ts / gemini.ts  # Feature models & Gemini response schema
+│   │   └── dtos/                # Gemini API DTOs
 │   ├── App.tsx                  # Main application shell & tab routing
 │   ├── index.css                # Tailwind CSS v4 styling
 │   └── main.tsx                 # React DOM root

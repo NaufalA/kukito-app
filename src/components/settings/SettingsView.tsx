@@ -2,18 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { Key, RotateCcw, ExternalLink, Sparkles, Check, Trash2 } from 'lucide-react';
 import { GeminiModel, UserSettings } from '../../types';
 import { listGeminiModels } from '../../services/gemini';
+import { ImportedData } from '../../services/export';
+import { ExportImportSection } from './ExportImportSection';
 
 interface SettingsViewProps {
   settings: UserSettings;
+  exportCounts: {
+    ingredients: number;
+    equipment: number;
+    recipes: number;
+    deductionHistory: number;
+  };
   onSaveSettings: (settings: UserSettings) => void;
   onRunOnboarding: () => void;
+  onImportData: (data: ImportedData) => void;
   onResetAllData: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
   settings,
+  exportCounts,
   onSaveSettings,
   onRunOnboarding,
+  onImportData,
   onResetAllData,
 }) => {
   const [apiKey, setApiKey] = useState(settings.geminiApiKey || '');
@@ -109,6 +120,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           )}
         </button>
       </form>
+
+      {/* Data Export / Import */}
+      <ExportImportSection counts={exportCounts} onImport={onImportData} />
 
       {/* Setup Wizard */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">

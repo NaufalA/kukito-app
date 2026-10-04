@@ -113,6 +113,10 @@ export const storageService = {
     localStorage.setItem(STORAGE_KEYS.DEDUCTION_HISTORY, JSON.stringify(records.slice(0, 30)));
   },
 
+  setDeductionHistory(records: DeductionRecord[]): void {
+    localStorage.setItem(STORAGE_KEYS.DEDUCTION_HISTORY, JSON.stringify(records.slice(0, 30)));
+  },
+
   removeLastDeduction(): DeductionRecord | null {
     const records = this.getDeductionHistory();
     if (records.length === 0) return null;

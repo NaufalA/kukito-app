@@ -84,7 +84,7 @@ When validating changes, use the available commands directly. Do not claim that 
 
 7. **Dark theme is default** (`<html class="dark">` in `index.html`), though `UserSettings` has a `theme` field that's defined but not actively wired to toggle.
 
-8. **No `docs/` directory** — the README references `docs/implementation_plan.md` and `docs/walkthrough.md` but they don't exist in the repo. Create documentation when durable project knowledge needs to be recorded.
+8. **`docs/` directory** — contains durable project knowledge, with ADRs under `docs/decisions/` (see "Project Knowledge & Documentation" above). Create documentation when durable project knowledge needs to be recorded.
 
 9. **No `.github/` directory** — no CI workflows, no issue/PR templates.
 
